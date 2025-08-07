@@ -146,15 +146,14 @@ func TestPlaygroundValidator_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := v.Validate(tt.input)
+			valErr := v.Validate(tt.input)
 
-			if (err != nil) != tt.wantError {
-				t.Errorf("Validate() error = %v, wantError %v", err, tt.wantError)
+			if (valErr != nil) != tt.wantError {
+				t.Errorf("Validate() error = %v, wantError %v", valErr, tt.wantError)
 				return
 			}
 
-			if err != nil && len(tt.errorKeys) > 0 {
-				valErr := v.ParseError(err)
+			if valErr != nil && len(tt.errorKeys) > 0 {
 				for _, key := range tt.errorKeys {
 					if !valErr.HasError(key) {
 						t.Errorf("Expected error for field %s, but not found", key)
@@ -175,12 +174,10 @@ func TestPlaygroundValidator_ParseError(t *testing.T) {
 		Password: "short",
 	}
 
-	err := v.Validate(user)
-	if err == nil {
+	valErr := v.Validate(user)
+	if valErr == nil {
 		t.Fatal("Expected validation error, got nil")
 	}
-
-	valErr := v.ParseError(err)
 
 	tests := []struct {
 		field    string
@@ -217,12 +214,8 @@ func TestPlaygroundValidator_ParseError_NilError(t *testing.T) {
 
 	valErr := v.ParseError(nil)
 
-	if valErr.Errors == nil {
+	if valErr != nil {
 		t.Error("ParseError(nil) should return ValidationError with initialized Errors map")
-	}
-
-	if len(valErr.Errors) != 0 {
-		t.Error("ParseError(nil) should return empty Errors map")
 	}
 }
 
@@ -257,13 +250,13 @@ func TestPlaygroundValidator_RegisterValidation(t *testing.T) {
 		Number int `validate:"even"`
 	}
 
-	err = v.Validate(&testStruct{Number: 4})
-	if err != nil {
+	valErr := v.Validate(&testStruct{Number: 4})
+	if valErr != nil {
 		t.Errorf("Validate() with even number should pass, got error: %v", err)
 	}
 
-	err = v.Validate(&testStruct{Number: 5})
-	if err == nil {
+	valErr = v.Validate(&testStruct{Number: 5})
+	if valErr == nil {
 		t.Error("Validate() with odd number should fail")
 	}
 }
@@ -288,12 +281,10 @@ func TestPlaygroundValidator_NestedStructs(t *testing.T) {
 		},
 	}
 
-	err := v.Validate(person)
-	if err == nil {
+	valErr := v.Validate(person)
+	if valErr == nil {
 		t.Fatal("Expected validation error")
 	}
-
-	valErr := v.ParseError(err)
 
 	if !valErr.HasError("Address.Street") {
 		t.Error("Should have error for nested field 'address.street'")
@@ -364,15 +355,14 @@ func TestPlaygroundValidator_SliceValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := v.Validate(&tt.container)
+			valErr := v.Validate(&tt.container)
 
-			if (err != nil) != tt.wantError {
-				t.Errorf("Validate() error = %v, wantError %v", err, tt.wantError)
+			if (valErr != nil) != tt.wantError {
+				t.Errorf("Validate() error = %v, wantError %v", valErr, tt.wantError)
 				return
 			}
 
-			if err != nil && len(tt.errorKeys) > 0 {
-				valErr := v.ParseError(err)
+			if valErr != nil && len(tt.errorKeys) > 0 {
 				for _, key := range tt.errorKeys {
 					if !valErr.HasError(key) {
 						t.Errorf("Expected error for field %s, but not found", key)

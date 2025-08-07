@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-type ValidationErrors map[string]ValidationField
+type Errors map[string]ValidationField
 
-func (e ValidationErrors) MsgFor(fieldName string) string {
+func (e Errors) MsgFor(fieldName string) string {
 	f, ok := e[fieldName]
 	if !ok {
 		return ""
@@ -15,7 +15,7 @@ func (e ValidationErrors) MsgFor(fieldName string) string {
 	return f.Msg()
 }
 
-func (e ValidationErrors) HasError(fieldName string) bool {
+func (e Errors) HasError(fieldName string) bool {
 	_, ok := e[fieldName]
 	return ok
 }
@@ -100,11 +100,11 @@ func (v ValidationField) String() string {
 }
 
 type ValidationError struct {
-	Errors ValidationErrors
+	Errors Errors
 }
 
-func (v ValidationError) Error() string {
-	if len(v.Errors) == 0 {
+func (v *ValidationError) Error() string {
+	if v == nil || len(v.Errors) == 0 {
 		return "validation error"
 	}
 
@@ -115,14 +115,17 @@ func (v ValidationError) Error() string {
 	return "validation failed: " + strings.Join(msgs, "; ")
 }
 
-func (v ValidationError) MsgFor(fieldName string) string {
+func (v *ValidationError) MsgFor(fieldName string) string {
+	if v == nil {
+		return ""
+	}
 	return v.Errors.MsgFor(fieldName)
 }
 
-func (v ValidationError) HasError(fieldName string) bool {
-	return v.Errors.HasError(fieldName)
+func (v *ValidationError) HasError(fieldName string) bool {
+	return v != nil && v.Errors.HasError(fieldName)
 }
 
-func (v ValidationError) IsEmpty() bool {
-	return len(v.Errors) == 0
+func (v *ValidationError) IsEmpty() bool {
+	return v == nil || len(v.Errors) == 0
 }

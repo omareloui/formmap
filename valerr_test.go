@@ -112,7 +112,7 @@ func TestValidationField_String(t *testing.T) {
 }
 
 func TestValidationErrors_MsgFor(t *testing.T) {
-	errors := ValidationErrors{
+	errors := Errors{
 		"name":     ValidationField{Tag: "required"},
 		"email":    ValidationField{Tag: "email"},
 		"age":      ValidationField{Tag: "gte", Param: "18"},
@@ -141,7 +141,7 @@ func TestValidationErrors_MsgFor(t *testing.T) {
 }
 
 func TestValidationErrors_HasError(t *testing.T) {
-	errors := ValidationErrors{
+	errors := Errors{
 		"name":  ValidationField{Tag: "required"},
 		"email": ValidationField{Tag: "email"},
 	}
@@ -169,24 +169,24 @@ func TestValidationErrors_HasError(t *testing.T) {
 func TestValidationError_Error(t *testing.T) {
 	tests := []struct {
 		name     string
-		errors   ValidationErrors
+		errors   Errors
 		contains []string
 	}{
 		{
 			name:     "empty errors",
-			errors:   ValidationErrors{},
+			errors:   Errors{},
 			contains: []string{"validation error"},
 		},
 		{
 			name: "single error",
-			errors: ValidationErrors{
+			errors: Errors{
 				"name": ValidationField{Tag: "required"},
 			},
 			contains: []string{"validation failed", "name:", "This field is required"},
 		},
 		{
 			name: "multiple errors",
-			errors: ValidationErrors{
+			errors: Errors{
 				"name":  ValidationField{Tag: "required"},
 				"email": ValidationField{Tag: "email"},
 			},
@@ -210,7 +210,7 @@ func TestValidationError_Error(t *testing.T) {
 
 func TestValidationError_MsgFor(t *testing.T) {
 	valErr := ValidationError{
-		Errors: ValidationErrors{
+		Errors: Errors{
 			"name": ValidationField{Tag: "required"},
 		},
 	}
@@ -226,7 +226,7 @@ func TestValidationError_MsgFor(t *testing.T) {
 
 func TestValidationError_HasError(t *testing.T) {
 	valErr := ValidationError{
-		Errors: ValidationErrors{
+		Errors: Errors{
 			"name": ValidationField{Tag: "required"},
 		},
 	}
@@ -248,13 +248,13 @@ func TestValidationError_IsEmpty(t *testing.T) {
 	}{
 		{
 			name:     "empty validation error",
-			valErr:   ValidationError{Errors: ValidationErrors{}},
+			valErr:   ValidationError{Errors: Errors{}},
 			expected: true,
 		},
 		{
 			name: "validation error with errors",
 			valErr: ValidationError{
-				Errors: ValidationErrors{
+				Errors: Errors{
 					"field": ValidationField{Tag: "required"},
 				},
 			},

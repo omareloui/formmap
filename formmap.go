@@ -78,7 +78,7 @@ func (m *Mapper) MapToForm(doc any, valErr ValidationError, formData any) error 
 	formVal := reflect.ValueOf(formData)
 
 	if valErr.Errors == nil {
-		valErr.Errors = make(ValidationErrors)
+		valErr.Errors = make(Errors)
 	}
 
 	if docVal.Kind() != reflect.Ptr || formVal.Kind() != reflect.Ptr {

@@ -92,7 +92,7 @@ func TestMapper_MapToForm_Basic(t *testing.T) {
 	}
 
 	valErr := ValidationError{
-		Errors: ValidationErrors{
+		Errors: Errors{
 			"Name":     ValidationField{Tag: "required"},
 			"Price":    ValidationField{Tag: "gt", Param: "0"},
 			"Quantity": ValidationField{Tag: "gte", Param: "1"},
@@ -187,7 +187,7 @@ func TestMapper_MapToForm_NestedStruct(t *testing.T) {
 	}
 
 	valErr := ValidationError{
-		Errors: ValidationErrors{
+		Errors: Errors{
 			"Metadata.Version": ValidationField{Tag: "required"},
 		},
 	}
@@ -224,7 +224,7 @@ func TestMapper_MapToForm_Slices(t *testing.T) {
 	}
 
 	valErr := ValidationError{
-		Errors: ValidationErrors{
+		Errors: Errors{
 			"Items[0].Price":    ValidationField{Tag: "gt", Param: "0"},
 			"Items[1].ItemName": ValidationField{Tag: "required"},
 		},

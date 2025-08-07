@@ -6,11 +6,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type Validator interface {
-	Validate(input any) error
-	ParseError(err error) ValidationError
-}
-
 type PlaygroundValidator struct {
 	validator *validator.Validate
 }
@@ -21,19 +16,19 @@ func NewValidator() *PlaygroundValidator {
 	return &PlaygroundValidator{validator: val}
 }
 
-func (v *PlaygroundValidator) Validate(input any) error {
-	return v.validator.Struct(input)
+func (v *PlaygroundValidator) Validate(input any) *ValidationError {
+	return v.ParseError(v.validator.Struct(input))
 }
 
-func (v *PlaygroundValidator) ParseError(err error) ValidationError {
+func (v *PlaygroundValidator) ParseError(err error) *ValidationError {
 	if err == nil {
-		return ValidationError{Errors: ValidationErrors{}}
+		return nil
 	}
 
 	valErrors, ok := err.(validator.ValidationErrors)
 	if !ok {
-		return ValidationError{
-			Errors: ValidationErrors{
+		return &ValidationError{
+			Errors: Errors{
 				"_error": ValidationField{
 					Tag:   "invalid",
 					Field: "_error",
@@ -42,7 +37,7 @@ func (v *PlaygroundValidator) ParseError(err error) ValidationError {
 		}
 	}
 
-	valerr := ValidationErrors{}
+	valerr := Errors{}
 	for _, err := range valErrors {
 		namespace := err.Namespace()
 		firstDot := strings.Index(namespace, ".")
@@ -58,7 +53,7 @@ func (v *PlaygroundValidator) ParseError(err error) ValidationError {
 		}
 	}
 
-	return ValidationError{Errors: valerr}
+	return &ValidationError{Errors: valerr}
 }
 
 func (v *PlaygroundValidator) RegisterValidation(tag string, fn validator.Func) error {
