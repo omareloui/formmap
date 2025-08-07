@@ -147,7 +147,9 @@ mapper.RegisterConverter(reflect.TypeOf(Money{}), func(v reflect.Value) string {
 Override mapping logic for specific fields:
 
 ```go
-mapper.RegisterFieldMapper("user.created_at", func(docField, formField reflect.Value, path string, valErr *formmap.ValidationError) error {
+mapper.RegisterFieldMapper("user.created_at", func(docField,
+    formField reflect.Value, path string,
+    valErr *formmap.ValidationError) error {
     t := docField.Interface().(time.Time)
     formatted := t.Format("Jan 2, 2006")
 
