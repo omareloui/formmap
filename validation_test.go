@@ -8,38 +8,38 @@ import (
 )
 
 type TestUser struct {
-	ID          string       `json:"id" validate:"required"`
-	Name        string       `json:"name" validate:"required,min=3,max=50"`
-	Email       string       `json:"email" validate:"required,email"`
-	Age         int          `json:"age" validate:"gte=18,lte=120"`
-	Password    string       `json:"password" validate:"required,min=8"`
-	ConfirmPass string       `json:"confirm_pass" validate:"required,eqfield=Password"`
-	Role        string       `json:"role" validate:"required,oneof=admin user guest"`
-	Website     string       `json:"website" validate:"omitempty,url"`
-	Tags        []string     `json:"tags" validate:"max=5,dive,min=2"`
-	Profile     *TestProfile `json:"profile" validate:"omitempty"`
-	Settings    TestSettings `json:"settings"`
+	ID          string       `validate:"required"`
+	Name        string       `validate:"required,min=3,max=50"`
+	Email       string       `validate:"required,email"`
+	Age         int          `validate:"gte=18,lte=120"`
+	Password    string       `validate:"required,min=8"`
+	ConfirmPass string       `validate:"required,eqfield=Password"`
+	Role        string       `validate:"required,oneof=admin user guest"`
+	Website     string       `validate:"omitempty,url"`
+	Tags        []string     `validate:"max=5,dive,min=2"`
+	Profile     *TestProfile `validate:"omitempty"`
+	Settings    TestSettings
 }
 
 type TestProfile struct {
-	Bio      string    `json:"bio" validate:"max=500"`
-	Birthday time.Time `json:"birthday" validate:"required"`
+	Bio      string    `validate:"max=500"`
+	Birthday time.Time `validate:"required"`
 }
 
 type TestSettings struct {
-	Theme         string `json:"theme" validate:"required,oneof=light dark"`
-	Notifications bool   `json:"notifications"`
+	Theme         string `validate:"required,oneof=light dark"`
+	Notifications bool
 }
 
 type TestProduct struct {
-	Name     string        `json:"name" validate:"required"`
-	Variants []TestVariant `json:"variants" validate:"required,min=1,dive"`
+	Name     string        `validate:"required"`
+	Variants []TestVariant `validate:"required,min=1,dive"`
 }
 
 type TestVariant struct {
-	ID    string  `json:"id" validate:"required"`
-	Name  string  `json:"name" validate:"required"`
-	Price float64 `json:"price" validate:"required,gt=0"`
+	ID    string  `validate:"required"`
+	Name  string  `validate:"required"`
+	Price float64 `validate:"required,gt=0"`
 }
 
 func TestNewValidator(t *testing.T) {
@@ -265,13 +265,13 @@ func TestPlaygroundValidator_NestedStructs(t *testing.T) {
 	v := NewValidator()
 
 	type Address struct {
-		Street string `json:"street" validate:"required"`
-		City   string `json:"city" validate:"required"`
+		Street string `validate:"required"`
+		City   string `validate:"required"`
 	}
 
 	type Person struct {
-		Name    string  `json:"name" validate:"required"`
-		Address Address `json:"address"`
+		Name    string `validate:"required"`
+		Address Address
 	}
 
 	person := &Person{
@@ -295,12 +295,12 @@ func TestPlaygroundValidator_SliceValidation(t *testing.T) {
 	v := NewValidator()
 
 	type Item struct {
-		Name  string `json:"name" validate:"required"`
-		Value int    `json:"value" validate:"gt=0"`
+		Name  string `validate:"required"`
+		Value int    `validate:"gt=0"`
 	}
 
 	type Container struct {
-		Items []Item `json:"items" validate:"required,min=1,max=3,dive"`
+		Items []Item `validate:"required,min=1,max=3,dive"`
 	}
 
 	tests := []struct {

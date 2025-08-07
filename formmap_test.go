@@ -8,57 +8,57 @@ import (
 )
 
 type TestDocument struct {
-	ID          string        `json:"id"`
-	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Price       float64       `json:"price"`
-	Quantity    int           `json:"quantity"`
-	IsActive    bool          `json:"is_active"`
-	CreatedAt   time.Time     `json:"created_at"`
-	Duration    time.Duration `json:"duration"`
-	Tags        []string      `json:"tags"`
-	Metadata    TestMetadata  `json:"metadata"`
-	Items       []TestItem    `json:"items"`
-	OptionalPtr *string       `json:"optional_ptr"`
-	NestedPtr   *TestMetadata `json:"nested_ptr"`
+	ID          string
+	Name        string
+	Description string
+	Price       float64
+	Quantity    int
+	IsActive    bool
+	CreatedAt   time.Time
+	Duration    time.Duration
+	Tags        []string
+	Metadata    TestMetadata
+	Items       []TestItem
+	OptionalPtr *string
+	NestedPtr   *TestMetadata
 }
 
 type TestMetadata struct {
-	Version string `json:"version"`
-	Author  string `json:"author"`
+	Version string
+	Author  string
 }
 
 type TestItem struct {
-	ItemID   string  `json:"item_id"`
-	ItemName string  `json:"item_name"`
-	Price    float64 `json:"price"`
+	ItemID   string
+	ItemName string
+	Price    float64
 }
 
 type TestFormData struct {
-	ID          FormInputData     `json:"id"`
-	Name        FormInputData     `json:"name"`
-	Description FormInputData     `json:"description"`
-	Price       FormInputData     `json:"price"`
-	Quantity    FormInputData     `json:"quantity"`
-	IsActive    FormInputData     `json:"is_active"`
-	CreatedAt   FormInputData     `json:"created_at"`
-	Duration    FormInputData     `json:"duration"`
-	Tags        []FormInputData   `json:"tags"`
-	Metadata    TestMetadataForm  `json:"metadata"`
-	Items       []TestItemForm    `json:"items"`
-	OptionalPtr FormInputData     `json:"optional_ptr"`
-	NestedPtr   *TestMetadataForm `json:"nested_ptr"`
+	ID          FormInputData
+	Name        FormInputData
+	Description FormInputData
+	Price       FormInputData
+	Quantity    FormInputData
+	IsActive    FormInputData
+	CreatedAt   FormInputData
+	Duration    FormInputData
+	Tags        []FormInputData
+	Metadata    TestMetadataForm
+	Items       []TestItemForm
+	OptionalPtr FormInputData
+	NestedPtr   *TestMetadataForm
 }
 
 type TestMetadataForm struct {
-	Version FormInputData `json:"version"`
-	Author  FormInputData `json:"author"`
+	Version FormInputData
+	Author  FormInputData
 }
 
 type TestItemForm struct {
-	ItemID   FormInputData `json:"item_id"`
-	ItemName FormInputData `json:"item_name"`
-	Price    FormInputData `json:"price"`
+	ItemID   FormInputData
+	ItemName FormInputData
+	Price    FormInputData
 }
 
 func TestNewMapper(t *testing.T) {
