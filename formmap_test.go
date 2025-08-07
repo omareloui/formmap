@@ -91,7 +91,7 @@ func TestMapper_MapToForm_Basic(t *testing.T) {
 		Duration:    90 * time.Minute,
 	}
 
-	valErr := ValidationError{
+	valErr := &ValidationError{
 		Errors: Errors{
 			"Name":     ValidationField{Tag: "required"},
 			"Price":    ValidationField{Tag: "gt", Param: "0"},
@@ -186,7 +186,7 @@ func TestMapper_MapToForm_NestedStruct(t *testing.T) {
 		},
 	}
 
-	valErr := ValidationError{
+	valErr := &ValidationError{
 		Errors: Errors{
 			"Metadata.Version": ValidationField{Tag: "required"},
 		},
@@ -223,7 +223,7 @@ func TestMapper_MapToForm_Slices(t *testing.T) {
 		},
 	}
 
-	valErr := ValidationError{
+	valErr := &ValidationError{
 		Errors: Errors{
 			"Items[0].Price":    ValidationField{Tag: "gt", Param: "0"},
 			"Items[1].ItemName": ValidationField{Tag: "required"},
@@ -281,7 +281,7 @@ func TestMapper_MapToForm_Pointers(t *testing.T) {
 
 	formData := &TestFormData{}
 
-	err := mapper.MapToForm(doc, ValidationError{}, formData)
+	err := mapper.MapToForm(doc, nil, formData)
 	if err != nil {
 		t.Fatalf("MapToForm() error = %v", err)
 	}
@@ -309,7 +309,7 @@ func TestMapper_MapToForm_NilPointers(t *testing.T) {
 
 	formData := &TestFormData{}
 
-	err := mapper.MapToForm(doc, ValidationError{}, formData)
+	err := mapper.MapToForm(doc, nil, formData)
 	if err != nil {
 		t.Fatalf("MapToForm() error = %v", err)
 	}
@@ -337,7 +337,7 @@ func TestMapper_RegisterConverter(t *testing.T) {
 
 	formData := &TestFormData{}
 
-	err := mapper.MapToForm(doc, ValidationError{}, formData)
+	err := mapper.MapToForm(doc, nil, formData)
 	if err != nil {
 		t.Fatalf("MapToForm() error = %v", err)
 	}
@@ -350,7 +350,7 @@ func TestMapper_RegisterConverter(t *testing.T) {
 func TestMapper_RegisterFieldMapper(t *testing.T) {
 	mapper := NewMapper()
 
-	mapper.RegisterFieldMapper("Price", func(docField, formField reflect.Value, fieldPath string, valErr ValidationError) error {
+	mapper.RegisterFieldMapper("Price", func(docField, formField reflect.Value, fieldPath string, valErr *ValidationError) error {
 		price := docField.Float()
 		formatted := "$" + strconv.FormatFloat(price, 'f', 2, 64) + " USD"
 
@@ -365,7 +365,7 @@ func TestMapper_RegisterFieldMapper(t *testing.T) {
 
 	formData := &TestFormData{}
 
-	err := mapper.MapToForm(doc, ValidationError{}, formData)
+	err := mapper.MapToForm(doc, nil, formData)
 	if err != nil {
 		t.Fatalf("MapToForm() error = %v", err)
 	}
@@ -402,7 +402,7 @@ func TestMapper_MapToFormWithOptions(t *testing.T) {
 		},
 	}
 
-	err := mapper.MapToFormWithOptions(doc, ValidationError{}, formData, opts)
+	err := mapper.MapToFormWithOptions(doc, nil, formData, opts)
 	if err != nil {
 		t.Fatalf("MapToFormWithOptions() error = %v", err)
 	}
@@ -463,7 +463,7 @@ func TestMapper_ErrorHandling(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := mapper.MapToForm(tt.doc, ValidationError{}, tt.formData)
+			err := mapper.MapToForm(tt.doc, nil, tt.formData)
 			if (err != nil) != tt.wantError {
 				t.Errorf("MapToForm() error = %v, wantError %v", err, tt.wantError)
 			}
@@ -487,7 +487,7 @@ func TestMapper_ZeroValues(t *testing.T) {
 
 	formData := &TestFormData{}
 
-	err := mapper.MapToForm(doc, ValidationError{}, formData)
+	err := mapper.MapToForm(doc, nil, formData)
 	if err != nil {
 		t.Fatalf("MapToForm() error = %v", err)
 	}
@@ -529,7 +529,7 @@ func TestMapper_CustomTypeConversion(t *testing.T) {
 
 	formData := &TestFormData{}
 
-	err := mapper.MapToForm(doc, ValidationError{}, formData)
+	err := mapper.MapToForm(doc, nil, formData)
 	if err != nil {
 		t.Fatalf("MapToForm() error = %v", err)
 	}

@@ -14,7 +14,7 @@ type FormInputData struct {
 
 type ValueConverter func(v reflect.Value) string
 
-type FieldMapper func(docField reflect.Value, formField reflect.Value, fieldPath string, valErr ValidationError) error
+type FieldMapper func(docField reflect.Value, formField reflect.Value, fieldPath string, valErr *ValidationError) error
 
 type Mapper struct {
 	converters   map[reflect.Type]ValueConverter
@@ -73,10 +73,13 @@ func (m *Mapper) RegisterFieldMapper(fieldPath string, mapper FieldMapper) {
 	m.fieldMappers[fieldPath] = mapper
 }
 
-func (m *Mapper) MapToForm(doc any, valErr ValidationError, formData any) error {
+func (m *Mapper) MapToForm(doc any, valErr *ValidationError, formData any) error {
 	docVal := reflect.ValueOf(doc)
 	formVal := reflect.ValueOf(formData)
 
+	if valErr == nil {
+		valErr = &ValidationError{}
+	}
 	if valErr.Errors == nil {
 		valErr.Errors = make(Errors)
 	}
@@ -95,7 +98,7 @@ func (m *Mapper) MapToForm(doc any, valErr ValidationError, formData any) error 
 	return m.mapStruct(docVal, formVal, valErr, "")
 }
 
-func (m *Mapper) mapStruct(docVal, formVal reflect.Value, valErr ValidationError, pathPrefix string) error {
+func (m *Mapper) mapStruct(docVal, formVal reflect.Value, valErr *ValidationError, pathPrefix string) error {
 	docType := docVal.Type()
 	formType := formVal.Type()
 
@@ -150,7 +153,7 @@ func (m *Mapper) findFormField(formType reflect.Type, fieldName string) (reflect
 	return formType.FieldByName(fieldName)
 }
 
-func (m *Mapper) mapField(docFieldVal, formFieldVal reflect.Value, valErr ValidationError, fieldPath string, formField reflect.StructField) error {
+func (m *Mapper) mapField(docFieldVal, formFieldVal reflect.Value, valErr *ValidationError, fieldPath string, formField reflect.StructField) error {
 	formFieldType := formField.Type
 
 	if formFieldType.Name() == "FormInputData" {
@@ -181,7 +184,7 @@ func (m *Mapper) mapField(docFieldVal, formFieldVal reflect.Value, valErr Valida
 	return nil
 }
 
-func (m *Mapper) mapFormInputData(docFieldVal, formFieldVal reflect.Value, valErr ValidationError, fieldPath string) error {
+func (m *Mapper) mapFormInputData(docFieldVal, formFieldVal reflect.Value, valErr *ValidationError, fieldPath string) error {
 	value := m.convertValue(docFieldVal)
 
 	error := valErr.MsgFor(fieldPath)
@@ -200,7 +203,7 @@ func (m *Mapper) mapFormInputData(docFieldVal, formFieldVal reflect.Value, valEr
 	return nil
 }
 
-func (m *Mapper) mapSlice(docSlice, formSlice reflect.Value, valErr ValidationError, fieldPath string) error {
+func (m *Mapper) mapSlice(docSlice, formSlice reflect.Value, valErr *ValidationError, fieldPath string) error {
 	if formSlice.Len() != docSlice.Len() {
 		newSlice := reflect.MakeSlice(formSlice.Type(), docSlice.Len(), docSlice.Len())
 
@@ -280,9 +283,9 @@ type MapOptions struct {
 	SkipFields      []string
 }
 
-func (m *Mapper) MapToFormWithOptions(doc any, valErr ValidationError, formData any, opts MapOptions) error {
+func (m *Mapper) MapToFormWithOptions(doc any, valErr *ValidationError, formData any, opts MapOptions) error {
 	for fieldPath, converter := range opts.FieldConverters {
-		m.RegisterFieldMapper(fieldPath, func(docField reflect.Value, formField reflect.Value, path string, err ValidationError) error {
+		m.RegisterFieldMapper(fieldPath, func(docField reflect.Value, formField reflect.Value, path string, err *ValidationError) error {
 			value := converter(docField)
 			errorMsg := err.MsgFor(path)
 
