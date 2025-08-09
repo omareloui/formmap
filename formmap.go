@@ -73,13 +73,19 @@ func (m *Mapper) RegisterFieldMapper(fieldPath string, mapper FieldMapper) {
 	m.fieldMappers[fieldPath] = mapper
 }
 
-func (m *Mapper) MapToForm(doc any, valErr *ValidationError, formData any) error {
+func (m *Mapper) MapToForm(doc any, err error, formData any) error {
 	docVal := reflect.ValueOf(doc)
 	formVal := reflect.ValueOf(formData)
 
-	if valErr == nil {
-		valErr = &ValidationError{}
+	if err == nil {
+		err = &ValidationError{}
 	}
+
+	valErr, ok := err.(*ValidationError)
+	if !ok {
+		return fmt.Errorf("expected ValidationError, got %T", err)
+	}
+
 	if valErr.Errors == nil {
 		valErr.Errors = make(Errors)
 	}
@@ -283,7 +289,7 @@ type MapOptions struct {
 	SkipFields      []string
 }
 
-func (m *Mapper) MapToFormWithOptions(doc any, valErr *ValidationError, formData any, opts MapOptions) error {
+func (m *Mapper) MapToFormWithOptions(doc any, err error, formData any, opts MapOptions) error {
 	for fieldPath, converter := range opts.FieldConverters {
 		m.RegisterFieldMapper(fieldPath, func(docField reflect.Value, formField reflect.Value, path string, err *ValidationError) error {
 			value := converter(docField)
@@ -295,5 +301,5 @@ func (m *Mapper) MapToFormWithOptions(doc any, valErr *ValidationError, formData
 		})
 	}
 
-	return m.MapToForm(doc, valErr, formData)
+	return m.MapToForm(doc, err, formData)
 }

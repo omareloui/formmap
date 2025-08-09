@@ -1,6 +1,7 @@
 package formmap
 
 import (
+	"errors"
 	"reflect"
 	"strconv"
 	"testing"
@@ -75,6 +76,24 @@ func TestNewMapper(t *testing.T) {
 	if m.fieldMappers == nil {
 		t.Fatal("fieldMappers map is nil")
 	}
+}
+
+func TestMain_MapToForm_InvalidError(t *testing.T) {
+	mapper := NewMapper()
+
+	t.Run("Normal error", func(t *testing.T) {
+		err := mapper.MapToForm(new(TestDocument), errors.New("a non ValidationError error"), &TestFormData{})
+		if err == nil {
+			t.Fatal("Expected error for non ValidationError, got nil")
+		}
+	})
+
+	t.Run("ValidationError error", func(t *testing.T) {
+		err := mapper.MapToForm(new(TestDocument), new(ValidationError), &TestFormData{})
+		if err != nil {
+			t.Fatal("Expected to accept ValidationError without issues, got:", err)
+		}
+	})
 }
 
 func TestMapper_MapToForm_Basic(t *testing.T) {
